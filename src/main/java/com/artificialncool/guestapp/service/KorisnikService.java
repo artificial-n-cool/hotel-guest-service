@@ -1,12 +1,15 @@
 package com.artificialncool.guestapp.service;
 
 import com.artificialncool.guestapp.model.Korisnik;
+import com.artificialncool.guestapp.model.Notifikacija;
 import com.artificialncool.guestapp.model.enums.KorisnickaUloga;
+import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import com.artificialncool.guestapp.repository.KorisnikRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,9 +23,32 @@ public class KorisnikService {
     }
 
     public Korisnik getByUsername(String username) throws EntityNotFoundException {
-        return null;
+       return korisnikRepository.findByUsername(username)
+               .orElseThrow(() -> new EntityNotFoundException("Korisnik sa tim username ne postoji"));
     }
 
+    public Korisnik getByEmail(String email) throws EntityNotFoundException {
+        return korisnikRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new EntityNotFoundException("Korisnik sa tim email ne postoji"));
+    }
+
+
+    public List<Korisnik> getByUloga(KorisnickaUloga uloga) throws EntityNotFoundException {
+        return korisnikRepository.findAllByUloga(uloga);
+    }
+
+    public List<Korisnik> getAllHosts() {
+        return getByUloga(KorisnickaUloga.HOST);
+    }
+
+    public List<Korisnik> getAllGuests(){
+        return getByUloga(KorisnickaUloga.GUEST);
+    }
+
+    public List<Korisnik> getAllAboveAverageHosts(Double rating)
+    {
+        return korisnikRepository.findByProsecnaOcenaGreaterThanEqual(rating);
+    }
     public void createKorisnici() {
         korisnikRepository.save(Korisnik.builder()
                 .ime("Petar")
