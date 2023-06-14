@@ -23,11 +23,11 @@ public class SmestajService {
     }
 
     public List<Smestaj> getAllByNaziv(String naziv){
-        return smestajRepository.findByNazivIgnoreCase(naziv);
+        return smestajRepository.findByNazivContainsIgnoreCase(naziv);
     }
 
     public List<Smestaj> getAllByLokacija(String lokacija){
-        return smestajRepository.findByLokacijaIgnoreCase(lokacija);
+        return smestajRepository.findByLokacijaContainsIgnoreCase(lokacija);
     }
 
     public List<Smestaj> getAllAboveAverage(Double criterium){
