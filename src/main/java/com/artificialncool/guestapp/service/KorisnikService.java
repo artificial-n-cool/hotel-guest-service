@@ -20,6 +20,7 @@ public class KorisnikService {
     }
 
     public Korisnik getByUsername(String username) throws EntityNotFoundException {
+        return null;
     }
 
     public void createKorisnici() {
