@@ -55,6 +55,18 @@ public class SmestajService {
                 .baseCena(Cena.builder().cena(50.0).tipCene(TipCene.PO_OSOBI).build())
                 .build()
         );
+        smestajRepository.save(Smestaj.builder()
+                .naziv("Soko apartmani")
+                .lokacija("Avenija Neka 56")
+                .opis("Jako dobar smestaj i sve super")
+                .maxGostiju(5)
+                .minGostiju(2)
+                .pogodnosti("Fenomenalne")
+                .vlasnikID("2")
+                .prosecnaOcena(5.0)
+                .baseCena(Cena.builder().cena(120.0).tipCene(TipCene.PO_SMESTAJU).build())
+                .build()
+        );
     }
 
 
