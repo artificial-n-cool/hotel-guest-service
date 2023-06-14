@@ -20,9 +20,6 @@ public class KorisnikService {
     }
 
     public Korisnik getByUsername(String username) throws EntityNotFoundException {
-        return korisnikRepository
-                .findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("nema"));
     }
 
     public void createKorisnici() {
