@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SmestajRepository extends MongoRepository<Smestaj, String> {
+    List<Smestaj> findByLokacijaLikeIgnoreCase(String lokacija);
 
-    Optional<Smestaj> findByNaziv(String naziv);
-    Optional<Smestaj> findByLokacija(String lokacija);
+    List<Smestaj> findByNazivLikeIgnoreCase(String naziv);
 
-    Optional<List<Smestaj>> findByKorisnik(Korisnik k);
+    Optional<List<Smestaj>> findByKorisnikId(String Id);
 
     String deleteByID(String ID);
 

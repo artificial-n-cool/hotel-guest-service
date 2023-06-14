@@ -15,19 +15,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document("rezervacije")
 public class Rezervacija {
     @Id
     private String id;
-
     private Integer brojOsoba;
     private LocalDate datumOd;
     private LocalDate datumDo;
     private StatusRezervacije statusRezervacije;
-
-    @DocumentReference
-    private Korisnik korisnik;
-
-    @DocumentReference
-    private Smestaj smestaj;
+    private String KorisnikID;
 }

@@ -15,18 +15,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document("ocenekorisnika")
 public class OcenaKorisnika {
     @Id
-    private Long ID;
-
+    private String id;
     private Double ocena;
+    private String ocenjivacID;
     private LocalDateTime datum;
-
-    @DocumentReference
-    private Korisnik ocenjivac;
-
-    @DocumentReference
-    private Korisnik host;
 }
 

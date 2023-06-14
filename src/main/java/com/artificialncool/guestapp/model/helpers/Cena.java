@@ -13,10 +13,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document("cene")
 public class Cena {
     @Id
-    private Long ID;
+    private String id;
     private Double cena;
     private TipCene tipCene;
 }
