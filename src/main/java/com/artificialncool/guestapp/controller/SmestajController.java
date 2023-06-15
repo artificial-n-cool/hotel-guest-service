@@ -11,6 +11,7 @@ import com.artificialncool.guestapp.dto.model.SmestajDTO;
 import com.artificialncool.guestapp.model.Korisnik;
 import com.artificialncool.guestapp.model.Rezervacija;
 import com.artificialncool.guestapp.model.Smestaj;
+import com.artificialncool.guestapp.model.enums.StatusRezervacije;
 import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import com.artificialncool.guestapp.model.helpers.OcenaSmestaja;
 import com.artificialncool.guestapp.service.KorisnikService;
@@ -116,7 +117,11 @@ public class SmestajController {
         try{
             Smestaj smestaj = smestajService.getById(smestajID);
             List<Rezervacija> sveRezervacije = smestaj.getRezervacije();
-            sveRezervacije.removeIf(rezervacija -> rezervacija.getId().equals(rezervacijaID));
+            sveRezervacije = sveRezervacije.stream().peek(rezervacija -> {
+                if (rezervacija.getId().equals(rezervacijaID)){
+                    rezervacija.setStatusRezervacije(StatusRezervacije.OTKAZANO);
+                }
+            }).toList();
             smestaj.setRezervacije(sveRezervacije);
             smestajService.save(smestaj);
             return new ResponseEntity<>(HttpStatus.OK);
