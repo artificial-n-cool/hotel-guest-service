@@ -20,6 +20,10 @@ public interface SmestajRepository extends MongoRepository<Smestaj, String> {
 
     List<Smestaj> findByVlasnikID(String vlasnikID);
 
+    List<Smestaj> findByNazivContainsIgnoreCaseAndLokacijaContainsIgnoreCase(String naziv, String lokacija);
+
+
+
     long deleteByNaziv(String naziv);
 
     long deleteByLokacija(String lokacija);

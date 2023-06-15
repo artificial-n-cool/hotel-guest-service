@@ -21,7 +21,7 @@ public class SmestajDTO {
     private Integer maxGostiju;
     private Double prosecnaOcena;
     private String vlasnikID;
-    private Double cena;
+    private Double baseCena;
     private TipCene tipCene;
     private Double finalCena;
 }
