@@ -2,6 +2,7 @@ package com.artificialncool.guestapp.service;
 
 import com.artificialncool.guestapp.model.Korisnik;
 import com.artificialncool.guestapp.model.Notifikacija;
+import com.artificialncool.guestapp.model.Smestaj;
 import com.artificialncool.guestapp.model.enums.KorisnickaUloga;
 import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import com.artificialncool.guestapp.repository.KorisnikRepository;
@@ -18,8 +19,15 @@ public class KorisnikService {
 
     private final KorisnikRepository korisnikRepository;
 
+
     public List<Korisnik> getAll() {
         return korisnikRepository.findAll();
+    }
+
+    public Korisnik getById(String id) throws EntityNotFoundException{
+        return korisnikRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No such smestaj"));
     }
 
     public Korisnik getByUsername(String username) throws EntityNotFoundException {
@@ -48,6 +56,10 @@ public class KorisnikService {
     public List<Korisnik> getAllAboveAverageHosts(Double rating)
     {
         return korisnikRepository.findByProsecnaOcenaGreaterThanEqual(rating);
+    }
+
+    public Korisnik save(Korisnik korisnik) {
+        return korisnikRepository.save(korisnik);
     }
     public void createKorisnici() {
         korisnikRepository.save(Korisnik.builder()

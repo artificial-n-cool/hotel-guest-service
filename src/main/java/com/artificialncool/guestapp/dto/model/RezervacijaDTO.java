@@ -1,18 +1,23 @@
 package com.artificialncool.guestapp.dto.model;
 
+
+import lombok.*;
+
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class RezervacijaDTO {
-
-
     // id
-
-    // broj osoba
-
-    // datum od i do
-
-    // status rezervacije String polja iy enuma
-
-    // korisnik id, ko pravi rez
-
-    // smestaj id, za koji rez se pravi
+    private String id;
+    private Integer brojOsoba;
+    private LocalDate datumOd;
+    private LocalDate datumDo;
+    private String statusRezervacije;
+    private String ocenjivacId;
+    private String smestajId;
 
 }

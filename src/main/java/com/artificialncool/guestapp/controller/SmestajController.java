@@ -1,12 +1,19 @@
 package com.artificialncool.guestapp.controller;
 
 
+import com.artificialncool.guestapp.dto.converter.OcenaKorisnikaConverter;
+import com.artificialncool.guestapp.dto.converter.RezervacijaConverter;
 import com.artificialncool.guestapp.dto.converter.SmestajConverter;
+import com.artificialncool.guestapp.dto.model.OcenaKorisnikaDTO;
 import com.artificialncool.guestapp.dto.model.OcenaSmestajaDTO;
+import com.artificialncool.guestapp.dto.model.RezervacijaDTO;
 import com.artificialncool.guestapp.dto.model.SmestajDTO;
+import com.artificialncool.guestapp.model.Korisnik;
 import com.artificialncool.guestapp.model.Rezervacija;
 import com.artificialncool.guestapp.model.Smestaj;
+import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import com.artificialncool.guestapp.model.helpers.OcenaSmestaja;
+import com.artificialncool.guestapp.service.KorisnikService;
 import com.artificialncool.guestapp.service.OcenaSmestajService;
 import com.artificialncool.guestapp.service.SmestajService;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,6 +34,9 @@ public class SmestajController {
     private final SmestajService smestajService;
     private final OcenaSmestajService ocenaSmestajService;
     private final SmestajConverter smestajConverter;
+    private final RezervacijaConverter rezervacijaConverter;
+    private final OcenaKorisnikaConverter ocenaKorisnikaConverter;
+    private final KorisnikService korisnikService;
 
 
     @GetMapping
@@ -50,7 +60,7 @@ public class SmestajController {
     }
 
 
-    @PutMapping(value = "/oceni")
+    @PutMapping(value = "/oceniSmestaj")
     public ResponseEntity<SmestajDTO> oceniSmestaj(@RequestBody OcenaSmestajaDTO ocenaSmestajaDTO) throws EntityNotFoundException{
         try{
             OcenaSmestaja novaOcena = ocenaSmestajService.fromDTO(ocenaSmestajaDTO);
@@ -71,11 +81,37 @@ public class SmestajController {
 
         }
         catch (EntityNotFoundException e){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema ovog smestaja!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema ovog smestaja!", e);
         }
     }
 
-    @PutMapping(value = "/otkaziRezervacije")
+
+    @PutMapping(value = "/oceniHosta")
+    public ResponseEntity<Double> oceniHosta(@RequestBody OcenaKorisnikaDTO ocenaKorisnikaDTO) throws EntityNotFoundException{
+        try
+        {
+            OcenaKorisnika novaOcena = ocenaKorisnikaConverter.fromDTO(ocenaKorisnikaDTO);
+            Korisnik host = korisnikService.getById(ocenaKorisnikaDTO.getHostId());
+            List<OcenaKorisnika> prethodneOcene = host.getOcene();
+            Double stariProsek = host.getProsecnaOcena();
+            Double noviProsek = 0.0;
+            if ( host.getOcene().toArray().length != 0 )
+            {
+                noviProsek = ((stariProsek * host.getOcene().toArray().length) + novaOcena.getOcena()) / (host.getOcene().toArray().length + 1);
+            }
+            prethodneOcene.add(novaOcena);
+            host.setOcene(prethodneOcene);
+            host.setProsecnaOcena(noviProsek);
+            Korisnik k = korisnikService.save(host);
+            return new ResponseEntity<>(k.getProsecnaOcena(), HttpStatus.OK);
+        }
+        catch (EntityNotFoundException ex)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema ovog smestaja!", ex);
+        }
+    }
+
+    @PutMapping(value = "/otkaziRezervaciju")
     public ResponseEntity<Void> otkaziRezervaciju(@RequestBody String smestajID, @RequestBody String rezervacijaID) throws EntityNotFoundException{
         try{
             Smestaj smestaj = smestajService.getById(smestajID);
@@ -85,6 +121,26 @@ public class SmestajController {
             smestajService.save(smestaj);
             return new ResponseEntity<>(HttpStatus.OK);
 
+        }
+        catch (EntityNotFoundException ex)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Smestaj nije pronadjen", ex);
+        }
+    }
+
+    @PostMapping(value = "rezervisiSmestaj")
+    public ResponseEntity<SmestajDTO> rezervisiSmestaj(@RequestBody RezervacijaDTO rezervacijaDTO) throws EntityNotFoundException{
+        try
+        {
+            Smestaj smestaj = smestajService.getById(rezervacijaDTO.getSmestajId());
+            List<Rezervacija> rezervacije = smestaj.getRezervacije();
+            rezervacije.add(rezervacijaConverter.fromDTO(rezervacijaDTO));
+            smestaj.setRezervacije(rezervacije);
+            smestajService.save(smestaj);
+            return new ResponseEntity<>(
+                    smestajConverter.toDTO(smestaj),
+                    HttpStatus.OK
+                );
         }
         catch (EntityNotFoundException ex)
         {
