@@ -8,13 +8,21 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SmestajRepository extends MongoRepository<Smestaj, String> {
-    List<Smestaj> findByNazivIgnoreCase(String naziv);
+    //List<Smestaj> findByNazivIgnoreCase(String naziv);
 
-    List<Smestaj> findByLokacijaIgnoreCase(String lokacija);
+    //List<Smestaj> findByLokacijaIgnoreCase(String lokacija);
+
+    List<Smestaj> findByNazivContainsIgnoreCase(String naziv);
+
+    List<Smestaj> findByLokacijaContainsIgnoreCase(String lokacija);
 
     List<Smestaj> findByProsecnaOcenaGreaterThanEqual(Double prosecnaOcena);
 
     List<Smestaj> findByVlasnikID(String vlasnikID);
+
+    List<Smestaj> findByNazivContainsIgnoreCaseAndLokacijaContainsIgnoreCase(String naziv, String lokacija);
+
+
 
     long deleteByNaziv(String naziv);
 
