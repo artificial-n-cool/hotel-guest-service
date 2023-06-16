@@ -40,4 +40,5 @@ public class Korisnik {
     private String prebivalste;
     private Double prosecnaOcena;
     private KorisnickaUloga uloga;
+    private boolean enabled;
 }
