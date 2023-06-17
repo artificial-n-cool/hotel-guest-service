@@ -133,7 +133,7 @@ public class SmestajController {
         }
     }
 
-    @PostMapping(value = "rezervisiSmestaj")
+    @PostMapping(value = "/rezervisiSmestaj")
     public ResponseEntity<SmestajDTO> rezervisiSmestaj(@RequestBody RezervacijaDTO rezervacijaDTO) throws EntityNotFoundException{
         try
         {
