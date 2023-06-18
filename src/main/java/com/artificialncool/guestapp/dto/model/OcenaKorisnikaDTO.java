@@ -13,6 +13,6 @@ public class OcenaKorisnikaDTO {
     private String id;
     private String ocenjivacId;
     private Double ocena;
-    private LocalDateTime datum;
+    private String datum; // y:m:d h:m
     private String hostId;
 }
