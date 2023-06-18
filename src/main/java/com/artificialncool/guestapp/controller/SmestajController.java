@@ -50,6 +50,11 @@ public class SmestajController {
         );
     }
 
+    @GetMapping(value = "/hello")
+    public ResponseEntity<String> hello(){
+        return new ResponseEntity<>("HELLO FROM GUEST SERVICE", HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{naziv}/{lokacija}/{datumOd}/{datumDo}")
     public ResponseEntity<List<SmestajDTO>> findByNazivAndLokacija(@PathVariable String naziv, @PathVariable String lokacija, @PathVariable LocalDateTime datumOd, @PathVariable LocalDateTime datumDo){
         Rezervacija dummyRez = Rezervacija.builder().datumDo(datumDo).datumOd(datumOd).build();
