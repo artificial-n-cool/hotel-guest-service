@@ -12,15 +12,19 @@ import com.artificialncool.guestapp.model.enums.TipCene;
 import com.artificialncool.guestapp.model.helpers.Cena;
 import com.artificialncool.guestapp.repository.KorisnikRepository;
 import com.artificialncool.guestapp.repository.SmestajRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
@@ -32,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import org.testcontainers.utility.DockerImageName;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +48,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.put;
 
-public class TestGuestAppIntegration extends AbstractIntegrationTest{
+@SpringBootTest
+@AutoConfigureMockMvc
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+public class TestGuestAppIntegration{
 
     @Autowired
     MockMvc mockMvc;
@@ -54,18 +62,25 @@ public class TestGuestAppIntegration extends AbstractIntegrationTest{
     @Autowired
     KorisnikRepository korisnikRepository;
 
-    @Autowired
-    OcenaKorisnikaConverter ocenaKorisnikaConverter;
+    static MongoDBContainer mongo =
+            new MongoDBContainer(DockerImageName.parse("mongo:latest"));
 
-    @Autowired
-    OcenaSmestajConverter ocenaSmestajConverter;
 
-    @Autowired
-    RezervacijaConverter rezervacijaConverter;
+    @DynamicPropertySource
+    static void configureDBConnection(DynamicPropertyRegistry dynamicPropertyRegistry){
+        dynamicPropertyRegistry.add("spring.data.mongodb.host", mongo::getHost);
+        dynamicPropertyRegistry.add("spring.data.mongodb.port", mongo::getFirstMappedPort);
+    }
 
-    @Autowired
-    SmestajConverter smestajConverter;
+    @BeforeAll
+    static void beforeAll(){
+        mongo.start();
+    }
 
+    @AfterAll
+    static void afterAll(){
+        mongo.stop();
+    }
     @BeforeEach
     void setup(){
         smestajRepository.deleteAll();
