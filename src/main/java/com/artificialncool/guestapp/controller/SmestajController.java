@@ -50,7 +50,7 @@ public class SmestajController {
         );
     }
 
-    @GetMapping("/{naziv}/{lokacija}/{datumOd}/{datumDo}")
+    @GetMapping(value = "/{naziv}/{lokacija}/{datumOd}/{datumDo}")
     public ResponseEntity<List<SmestajDTO>> findByNazivAndLokacija(@PathVariable String naziv, @PathVariable String lokacija, @PathVariable LocalDateTime datumOd, @PathVariable LocalDateTime datumDo){
         Rezervacija dummyRez = Rezervacija.builder().datumDo(datumDo).datumOd(datumOd).build();
         return new ResponseEntity<>(
