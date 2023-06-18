@@ -6,4 +6,4 @@ clean:
 	docker stop mongo-db
 	docker rm guest-app
 	docker rm mongo-db
-	docker rmi hostapp_host-app
+	docker rmi guestapp_guest-app
