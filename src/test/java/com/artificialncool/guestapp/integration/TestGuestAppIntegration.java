@@ -8,6 +8,8 @@ import com.artificialncool.guestapp.dto.model.OcenaKorisnikaDTO;
 import com.artificialncool.guestapp.dto.model.RezervacijaDTO;
 import com.artificialncool.guestapp.model.Korisnik;
 import com.artificialncool.guestapp.model.Smestaj;
+import com.artificialncool.guestapp.model.enums.TipCene;
+import com.artificialncool.guestapp.model.helpers.Cena;
 import com.artificialncool.guestapp.repository.KorisnikRepository;
 import com.artificialncool.guestapp.repository.SmestajRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,7 +93,7 @@ public class TestGuestAppIntegration extends AbstractIntegrationTest{
 
         OcenaKorisnikaDTO ocenaKorisnikaDTO = OcenaKorisnikaDTO.builder()
                 .ocena(5.0)
-                .datum(LocalDateTime.now())
+                .datum(LocalDateTime.now().toString())
                 .hostId(korisnik1.getId())
                 .ocenjivacId("2")
                 .build();
@@ -125,23 +127,29 @@ public class TestGuestAppIntegration extends AbstractIntegrationTest{
                 .vlasnikID("4025ti4j042tu")
                 .minGostiju(1)
                 .maxGostiju(3)
+                .baseCena(Cena.builder()
+                        .cena(50.0)
+                        .tipCene(TipCene.PO_OSOBI)
+                        .build())
                 .build();
 
-        smestajRepository.save(smestaj);
+        Smestaj s = smestajRepository.save(smestaj);
+
+        System.out.println(s.getId());
 
         //kreriraj DTO, kao sa fronta da je dosao
         RezervacijaDTO rezervacijaDTO = RezervacijaDTO.builder()
                 .brojOsoba(4)
-                .datumDo(LocalDate.now())
-                .datumOd(LocalDate.now())
-                .smestajId(smestaj.getId())
+                .datumDo(LocalDateTime.now().toString())
+                .datumOd(LocalDateTime.now().toString())
+                .smestajId(s.getId())
                 .statusRezervacije("U_OBRADI")
                 .ocenjivacId("1")
                 .build();
 
         //mockmvc poziv
         MockHttpServletRequestBuilder builder =
-                MockMvcRequestBuilders.put("/api/guest/smestaj/rezervisiSmestaj")
+                MockMvcRequestBuilders.post("/api/guest/smestaj/rezervisiSmestaj")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")

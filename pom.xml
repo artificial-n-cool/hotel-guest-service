@@ -77,6 +77,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>guest-app</finalName>
 	</build>
 
 </project>

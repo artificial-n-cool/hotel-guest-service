@@ -14,8 +14,8 @@ public class RezervacijaDTO {
     // id
     private String id;
     private Integer brojOsoba;
-    private LocalDate datumOd;
-    private LocalDate datumDo;
+    private String datumOd;
+    private String datumDo;
     private String statusRezervacije;
     private String ocenjivacId;
     private String smestajId;

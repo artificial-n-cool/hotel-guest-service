@@ -4,6 +4,8 @@ import com.artificialncool.guestapp.dto.model.OcenaKorisnikaDTO;
 import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class OcenaKorisnikaConverter {
 
@@ -14,7 +16,7 @@ public class OcenaKorisnikaConverter {
                 .ocena(dto.getOcena())
                 .id(dto.getId())
                 .ocenjivacID(dto.getOcenjivacId())
-                .datum(dto.getDatum())
+                .datum(LocalDateTime.parse(dto.getDatum()))
                 .build();
     }
 }

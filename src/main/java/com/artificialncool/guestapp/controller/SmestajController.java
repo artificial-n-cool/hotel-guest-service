@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class SmestajController {
     }
 
     @GetMapping("/{naziv}/{lokacija}/{datumOd}/{datumDo}")
-    public ResponseEntity<List<SmestajDTO>> findByNazivAndLokacija(@PathVariable String naziv, @PathVariable String lokacija, @PathVariable LocalDate datumOd, @PathVariable LocalDate datumDo){
+    public ResponseEntity<List<SmestajDTO>> findByNazivAndLokacija(@PathVariable String naziv, @PathVariable String lokacija, @PathVariable LocalDateTime datumOd, @PathVariable LocalDateTime datumDo){
         Rezervacija dummyRez = Rezervacija.builder().datumDo(datumDo).datumOd(datumOd).build();
         return new ResponseEntity<>(
                 smestajService.getByNazivAndLokacija(naziv, lokacija)
@@ -96,10 +97,14 @@ public class SmestajController {
             List<OcenaKorisnika> prethodneOcene = host.getOcene();
             Double stariProsek = host.getProsecnaOcena();
             Double noviProsek = 0.0;
-            if ( host.getOcene().toArray().length != 0 )
+            if ( host.getOcene() != null && host.getOcene().toArray().length != 0 )
             {
                 noviProsek = ((stariProsek * host.getOcene().toArray().length) + novaOcena.getOcena()) / (host.getOcene().toArray().length + 1);
             }
+            else{
+                noviProsek = ocenaKorisnikaDTO.getOcena();
+            }
+            prethodneOcene = new ArrayList<OcenaKorisnika>();
             prethodneOcene.add(novaOcena);
             host.setOcene(prethodneOcene);
             host.setProsecnaOcena(noviProsek);
@@ -139,6 +144,9 @@ public class SmestajController {
         {
             Smestaj smestaj = smestajService.getById(rezervacijaDTO.getSmestajId());
             List<Rezervacija> rezervacije = smestaj.getRezervacije();
+            if (rezervacije == null) {
+                rezervacije = new ArrayList<Rezervacija>();
+            }
             rezervacije.add(rezervacijaConverter.fromDTO(rezervacijaDTO));
             smestaj.setRezervacije(rezervacije);
             smestajService.save(smestaj);
