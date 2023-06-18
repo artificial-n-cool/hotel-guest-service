@@ -74,7 +74,11 @@ public class SmestajController {
             {
                 noviProsek = ((stariProsek * smestaj.getOcene().toArray().length) + novaOcena.getOcena()) / (smestaj.getOcene().toArray().length + 1);
             }
+            else{
+                noviProsek = ocenaSmestajaDTO.getOcena();
+            }
 
+            prethodneOcene = new ArrayList<OcenaSmestaja>();
             prethodneOcene.add(novaOcena);
             smestaj.setOcene(prethodneOcene);
             smestaj.setProsecnaOcena(noviProsek);
@@ -122,6 +126,9 @@ public class SmestajController {
         try{
             Smestaj smestaj = smestajService.getById(smestajID);
             List<Rezervacija> sveRezervacije = smestaj.getRezervacije();
+            if (sveRezervacije == null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
             sveRezervacije = sveRezervacije.stream().peek(rezervacija -> {
                 if (rezervacija.getId().equals(rezervacijaID)){
                     rezervacija.setStatusRezervacije(StatusRezervacije.OTKAZANO);
