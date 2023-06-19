@@ -119,6 +119,7 @@ public class SmestajController {
             smestaj.setOcene(prethodneOcene);
             smestaj.setProsecnaOcena(noviProsek);
             Smestaj s = smestajService.save(smestaj);
+            // MESSAGE CALL TO NOTIFICATION SERVICE DA IMA OCENA SMESTAJA
             return new ResponseEntity<>(smestajService.toDTO(s), HttpStatus.OK);
 
         }
@@ -149,6 +150,7 @@ public class SmestajController {
             host.setOcene(prethodneOcene);
             host.setProsecnaOcena(noviProsek);
             Korisnik k = korisnikService.save(host);
+            // TODO: MESSAGE CALL DA IMA NOVI HOST OCENA
             return new ResponseEntity<>(k.getProsecnaOcena(), HttpStatus.OK);
         }
         catch (EntityNotFoundException ex)
@@ -190,6 +192,7 @@ public class SmestajController {
                 ex.printStackTrace();
                 System.out.println("NEbitno");
             }
+            //TODO: MESSAGE CALL DA SE OTKAZALA REZERVACIJA
             return new ResponseEntity<>(HttpStatus.OK);
 
 
@@ -225,6 +228,7 @@ public class SmestajController {
                 ex.printStackTrace();
                 System.out.println("NEbitno");
             }
+            //TODO: MESSAGE CALL TO NOTIFICATION SERVICE DA IMA NOVA REZERVACIJA
             return new ResponseEntity<>(
                     smestajConverter.toDTO(smestaj),
                     HttpStatus.OK
@@ -234,5 +238,6 @@ public class SmestajController {
         {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Smestaj nije pronadjen", ex);
         }
+
     }
 }
