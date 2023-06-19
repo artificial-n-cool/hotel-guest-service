@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,6 +41,17 @@ public class RezervacijaService {
         smestajService.save(smestaj);
     }
 
+
+    public boolean CheckOneDayDiff(Rezervacija rezervacija){
+        LocalDateTime rezervacijaDatum = rezervacija.getDatumOd();
+        LocalDateTime danas = LocalDateTime.now();
+
+        boolean pre = rezervacijaDatum.getDayOfYear() < danas.getDayOfYear();
+
+        int diffInDays = Math.abs(rezervacijaDatum.getDayOfYear() - danas.getDayOfYear());
+
+        return pre && diffInDays <= 1;
+    }
 
     public Rezervacija findByIdAndSmestaj(String id, String smestajId) throws EntityNotFoundException {
         Smestaj smestaj = smestajService.getById(smestajId);

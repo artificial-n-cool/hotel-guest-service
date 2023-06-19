@@ -22,6 +22,11 @@ public class SmestajService {
     private final SmestajRepository smestajRepository;
     private final SmestajConverter smestajConverter;
 
+
+
+    public void deleteSmestaj(String id){
+        smestajRepository.deleteById(id);
+    }
     public Smestaj fromDTO(SmestajDTO dto) {
         return smestajConverter.fromDTO(dto);
     }

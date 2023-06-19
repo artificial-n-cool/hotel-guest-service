@@ -16,12 +16,16 @@ import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import com.artificialncool.guestapp.model.helpers.OcenaSmestaja;
 import com.artificialncool.guestapp.service.KorisnikService;
 import com.artificialncool.guestapp.service.OcenaSmestajService;
+import com.artificialncool.guestapp.service.RezervacijaService;
 import com.artificialncool.guestapp.service.SmestajService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -31,7 +35,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/guest/smestaj")
-@RequiredArgsConstructor
 public class SmestajController {
     private final SmestajService smestajService;
     private final OcenaSmestajService ocenaSmestajService;
@@ -40,6 +43,34 @@ public class SmestajController {
     private final OcenaKorisnikaConverter ocenaKorisnikaConverter;
     private final KorisnikService korisnikService;
 
+    private final RestTemplate restTemplate;
+
+    private final RezervacijaService rezervacijaService;
+
+
+    public SmestajController(RezervacijaService rezervacijaService,RestTemplateBuilder builder, SmestajService smestajService, OcenaSmestajService ocenaSmestajService, SmestajConverter smestajConverter, RezervacijaConverter rezervacijaConverter, OcenaKorisnikaConverter ocenaKorisnikaConverter, KorisnikService korisnikService){
+        this.rezervacijaService = rezervacijaService;
+        this.restTemplate = builder.build();
+        this.smestajService = smestajService;
+        this.ocenaSmestajService = ocenaSmestajService;
+        this.smestajConverter = smestajConverter;
+        this.rezervacijaConverter = rezervacijaConverter;
+        this.ocenaKorisnikaConverter = ocenaKorisnikaConverter;
+        this.korisnikService = korisnikService;
+    }
+
+
+
+    @DeleteMapping(value = "/deleteSmestaj/{id}")
+    public ResponseEntity<Void> deleteSmestaj(@RequestBody String id){
+        smestajService.deleteSmestaj(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PutMapping(value = "/updateSmestaj")
+    public ResponseEntity<Void> updateSmestaj(@RequestBody SmestajDTO smestajDTO){
+        this.smestajService.update(smestajConverter.fromDTO(smestajDTO));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @GetMapping
     public ResponseEntity<List<SmestajDTO>> readAll(){
@@ -126,6 +157,12 @@ public class SmestajController {
         }
     }
 
+    @PostMapping(value = "/addSmestaj")
+    public ResponseEntity<Void> createSmestaj(@RequestBody SmestajDTO smestajDTO){
+        smestajService.save(smestajConverter.fromDTO(smestajDTO));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PutMapping(value = "/otkaziRezervaciju")
     public ResponseEntity<Void> otkaziRezervaciju(@RequestBody String smestajID, @RequestBody String rezervacijaID) throws EntityNotFoundException{
         try{
@@ -135,13 +172,27 @@ public class SmestajController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             sveRezervacije = sveRezervacije.stream().peek(rezervacija -> {
-                if (rezervacija.getId().equals(rezervacijaID)){
+                if (rezervacija.getId().equals(rezervacijaID) && (rezervacijaService.CheckOneDayDiff(rezervacija))){
                     rezervacija.setStatusRezervacije(StatusRezervacije.OTKAZANO);
                 }
             }).toList();
             smestaj.setRezervacije(sveRezervacije);
             smestajService.save(smestaj);
+            try{
+                restTemplate.postForEntity(
+                        String.format("http://host-app:8080/api/host/rezervacije/cancel/%s/%s", rezervacijaID, smestajID),
+                        null,
+                        RezervacijaDTO.class
+                );
+
+            }
+            catch (RestClientException ex){
+                ex.printStackTrace();
+                System.out.println("NEbitno");
+            }
             return new ResponseEntity<>(HttpStatus.OK);
+
+
 
         }
         catch (EntityNotFoundException ex)
@@ -162,6 +213,18 @@ public class SmestajController {
             rezervacije.add(rezervacijaConverter.fromDTO(rezervacijaDTO));
             smestaj.setRezervacije(rezervacije);
             smestajService.save(smestaj);
+            try{
+                restTemplate.postForEntity(
+                        String.format("http://host-app:8080/api/host/rezervacije"),
+                        rezervacijaDTO,
+                        RezervacijaDTO.class
+                );
+
+            }
+            catch (RestClientException ex){
+                ex.printStackTrace();
+                System.out.println("NEbitno");
+            }
             return new ResponseEntity<>(
                     smestajConverter.toDTO(smestaj),
                     HttpStatus.OK
