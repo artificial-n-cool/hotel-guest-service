@@ -1,0 +1,24 @@
+version: "2.0"
+services:
+  guest-app:
+    container_name: guest-app
+    build: ..
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mongo-db
+    environment:
+      - SPRING_DATA_MONGODB_HOST=mongo-db
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=guest-info-db
+  mongo-db:
+    image: "mongo"
+    container_name: mongo-db
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - guest-db:/data/db
+volumes:
+  guest-db:
