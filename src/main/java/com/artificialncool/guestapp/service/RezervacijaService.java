@@ -1,7 +1,9 @@
 package com.artificialncool.guestapp.service;
 
 
+import com.artificialncool.guestapp.dto.model.CenaSaPromocijomDTO;
 import com.artificialncool.guestapp.dto.model.RezervacijaDTO;
+import com.artificialncool.guestapp.model.Promocija;
 import com.artificialncool.guestapp.model.Rezervacija;
 import com.artificialncool.guestapp.model.Smestaj;
 import com.artificialncool.guestapp.model.enums.StatusRezervacije;
@@ -16,11 +18,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class RezervacijaService {
 
-    private final SmestajRepository smestajRepository;
     private final SmestajService smestajService;
+
+
+    public RezervacijaService(SmestajService smestajService){
+        this.smestajService = smestajService;
+    }
 
     public void createRezervacija(RezervacijaDTO dto) {
         Rezervacija rezervacija = Rezervacija.builder()
@@ -51,6 +56,38 @@ public class RezervacijaService {
         int diffInDays = Math.abs(rezervacijaDatum.getDayOfYear() - danas.getDayOfYear());
 
         return pre && diffInDays <= 1;
+    }
+
+
+    public CenaSaPromocijomDTO returnUkupnaCena(RezervacijaDTO rezervacijaDTO){
+            Smestaj smestaj = null;
+            try {
+                 smestaj = smestajService.getById(rezervacijaDTO.getSmestajId());
+            }
+            catch (EntityNotFoundException ex){
+                ex.printStackTrace();
+            }
+            List<Promocija> promocijaList = smestaj.getPromocije();
+            double baseCena = smestaj.getBaseCena().getCena();
+            if (promocijaList == null || promocijaList.isEmpty()){
+                return CenaSaPromocijomDTO.builder().ukupnaCena(baseCena).build();
+            }
+            for (Promocija promocija : promocijaList){
+                LocalDate pocetakPromocije = promocija.getDatumOd();
+                LocalDate pocetakRezervacije = LocalDate.parse(rezervacijaDTO.getDatumOd());
+                LocalDate krajPromocije = promocija.getDatumDo();
+                LocalDate krajRezervacije = LocalDate.parse(rezervacijaDTO.getDatumDo());
+                if (pocetakPromocije.isBefore(pocetakRezervacije) && krajPromocije.isAfter(krajRezervacije)){
+                    for (LocalDate date = pocetakRezervacije; date.isBefore(krajRezervacije); date = date.plusDays(1))
+                    {
+                            if(promocija.getDani().contains(date.getDayOfWeek())){
+                                baseCena += baseCena * (promocija.getProcenat() + 1);
+                            }
+                    }
+                }
+            }
+
+            return CenaSaPromocijomDTO.builder().ukupnaCena(baseCena).build();
     }
 
     public Rezervacija findByIdAndSmestaj(String id, String smestajId) throws EntityNotFoundException {
