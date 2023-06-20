@@ -2,7 +2,7 @@ version: "2.0"
 services:
   guest-app:
     container_name: guest-app
-    build: ..
+    build: .
     restart: always
     ports:
       - "8081:8080"
