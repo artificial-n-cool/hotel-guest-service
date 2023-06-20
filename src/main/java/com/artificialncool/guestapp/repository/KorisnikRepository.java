@@ -1,18 +1,43 @@
 package com.artificialncool.guestapp.repository;
 
 import com.artificialncool.guestapp.model.Korisnik;
+import com.artificialncool.guestapp.model.enums.KorisnickaUloga;
+import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface KorisnikRepository extends MongoRepository<Korisnik, String> {
     Optional<Korisnik> findByUsername(String username);
 
-    Optional<Korisnik> findByEmail(String email);
+    Optional<Korisnik> findByEmailIgnoreCase(String email);
 
-    String deleteByID(String ID);
+    List<Korisnik> findAllByUloga(KorisnickaUloga uloga);
 
-    String deleteByUsername(String username);
+    List<Korisnik> findByProsecnaOcenaGreaterThanEqual(Double prosecnaOcena);
 
-    Korisnik findByPrebivalsteContainsIgnoreCase(String prebivaliste);
+    long deleteByUsername(String username);
+
+    long deleteByEmailIgnoreCase(String email);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
