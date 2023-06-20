@@ -1,5 +1,6 @@
 package com.artificialncool.guestapp.controller;
 
+import com.artificialncool.guestapp.dto.model.CenaSaPromocijomDTO;
 import com.artificialncool.guestapp.dto.model.RezervacijaDTO;
 import com.artificialncool.guestapp.dto.model.SmestajDTO;
 import com.artificialncool.guestapp.model.Rezervacija;
@@ -25,6 +26,15 @@ public class RezervacijaController {
     public RezervacijaController(RezervacijaService rezervacijaService, RestTemplateBuilder restTemplateBuilder){
         this.rezervacijaService = rezervacijaService;
         this.restTemplate = restTemplateBuilder.build();
+    }
+
+
+    @GetMapping(value = "/getUkupnaCena")
+    public ResponseEntity<CenaSaPromocijomDTO> getUkupnaCena(@RequestBody RezervacijaDTO dto){
+        return new ResponseEntity<>(
+                rezervacijaService.returnUkupnaCena(dto),
+                HttpStatus.OK
+        );
     }
 
 
