@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: guest-app
+  name: guest-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: guest-app
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/kubernetes-config-default: "true"
+        io.kompose.service: guest-app
+    spec:
+      containers:
+        - env:
+            - name: SPRING_DATA_MONGODB_DATABASE
+              value: guest-info-db
+            - name: SPRING_DATA_MONGODB_HOST
+              value: mongo-db
+            - name: SPRING_DATA_MONGODB_PORT
+              value: "27017"
+          image: guest-app
+          name: guest-app
+          ports:
+            - containerPort: 8080
+          resources: {}
+      restartPolicy: Always
+status: {}
