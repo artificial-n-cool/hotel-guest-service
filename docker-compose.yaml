@@ -7,18 +7,28 @@ services:
     ports:
       - "8081:8080"
     depends_on:
-      - mongo-db
+      - mongo-db-guest
     environment:
-      - SPRING_DATA_MONGODB_HOST=mongo-db
-      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_HOST=mongo-db-guest
+      - SPRING_DATA_MONGODB_PORT=27018
       - SPRING_DATA_MONGODB_DATABASE=guest-info-db
-  mongo-db:
+    networks:
+      - database-net
+
+  mongo-db-guest:
     image: "mongo"
-    container_name: mongo-db
+    container_name: mongo-db-guest
     restart: always
     ports:
       - "27018:27017"
     volumes:
       - guest-db:/data/db
+    networks:
+      - database-net
 volumes:
   guest-db:
+
+networks:
+  database-net:
+    external:
+      name: app-net

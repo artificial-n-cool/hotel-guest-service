@@ -88,6 +88,7 @@ public class SmestajController {
             smestaj.setOcene(prethodneOcene);
             smestaj.setProsecnaOcena(noviProsek);
             Smestaj s = smestajService.save(smestaj);
+            // TODO: Send update to Host app
             return new ResponseEntity<>(smestajService.toDTO(s), HttpStatus.OK);
 
         }
@@ -118,6 +119,7 @@ public class SmestajController {
             host.setOcene(prethodneOcene);
             host.setProsecnaOcena(noviProsek);
             Korisnik k = korisnikService.save(host);
+            // TODO: Send update to Guest app
             return new ResponseEntity<>(k.getProsecnaOcena(), HttpStatus.OK);
         }
         catch (EntityNotFoundException ex)
@@ -141,6 +143,7 @@ public class SmestajController {
             }).toList();
             smestaj.setRezervacije(sveRezervacije);
             smestajService.save(smestaj);
+            // TODO: Send update to Host app
             return new ResponseEntity<>(HttpStatus.OK);
 
         }
@@ -162,6 +165,7 @@ public class SmestajController {
             rezervacije.add(rezervacijaConverter.fromDTO(rezervacijaDTO));
             smestaj.setRezervacije(rezervacije);
             smestajService.save(smestaj);
+            // TODP: Send update to Host app
             return new ResponseEntity<>(
                     smestajConverter.toDTO(smestaj),
                     HttpStatus.OK
