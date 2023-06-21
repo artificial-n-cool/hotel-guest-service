@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  creationTimestamp: null
+  name: kubernetes-config-default
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              io.kompose.network/kubernetes-config-default: "true"
+  podSelector:
+    matchLabels:
+      io.kompose.network/kubernetes-config-default: "true"
