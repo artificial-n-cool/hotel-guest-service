@@ -10,7 +10,7 @@ services:
       - mongo-db-guest
     environment:
       - SPRING_DATA_MONGODB_HOST=mongo-db-guest
-      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_PORT=27018
       - SPRING_DATA_MONGODB_DATABASE=guest-info-db
     networks:
       - database-net
