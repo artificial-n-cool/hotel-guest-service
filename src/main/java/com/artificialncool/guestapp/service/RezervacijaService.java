@@ -66,6 +66,7 @@ public class RezervacijaService {
             }
             catch (EntityNotFoundException ex){
                 ex.printStackTrace();
+                return null;
             }
             List<Promocija> promocijaList = smestaj.getPromocije();
             double baseCena = smestaj.getBaseCena().getCena();

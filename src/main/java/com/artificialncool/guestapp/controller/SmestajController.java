@@ -62,7 +62,7 @@ public class SmestajController {
 
 
     @DeleteMapping(value = "/deleteSmestaj/{id}")
-    public ResponseEntity<Void> deleteSmestaj(@RequestBody String id){
+    public ResponseEntity<Void> deleteSmestaj(@PathVariable String id){
         smestajService.deleteSmestaj(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

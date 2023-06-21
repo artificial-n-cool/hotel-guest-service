@@ -62,7 +62,7 @@ public class RezervacijaController {
     public ResponseEntity<Void> setStatusRezervacije(@PathVariable String id, @PathVariable String smestajID, @PathVariable String status){
         StatusRezervacije sta = StatusRezervacije.valueOf(status);
         Rezervacija rezervacija = rezervacijaService.setReservationStatus(id, smestajID, sta);
-        if (rezervacija.getStatusRezervacije().equals("OTKAZANO"))
+        if (rezervacija.getStatusRezervacije().equals(StatusRezervacije.OTKAZANO))
             try{
                 restTemplate.postForEntity(
                         String.format("http://host-app:8080/api/host/rezervacije/cancel/%s/%s", rezervacija.getId(), smestajID),
