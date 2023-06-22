@@ -1,9 +1,10 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: guest-data-volume
   labels:
+    app: guest-pv
     type: local
+  name: guest-pv-volume
 spec:
   storageClassName: manual
   capacity:

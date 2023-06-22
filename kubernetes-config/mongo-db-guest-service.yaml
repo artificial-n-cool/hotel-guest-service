@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongo-db-guest
+  name: mongo-db-guest
+spec:
+  ports:
+    - name: "27018"
+      port: 27018
+      targetPort: 27017
+  selector:
+    app: mongo-db-guest
+status:
+  loadBalancer: {}

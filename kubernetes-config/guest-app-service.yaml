@@ -1,12 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.28.0 (c4137012e)
-  creationTimestamp: null
   labels:
-    io.kompose.service: guest-app
+    app: guest-app
   name: guest-app
 spec:
   ports:
@@ -14,6 +10,6 @@ spec:
       port: 8081
       targetPort: 8080
   selector:
-    io.kompose.service: guest-app
+    app: guest-app
 status:
   loadBalancer: {}
