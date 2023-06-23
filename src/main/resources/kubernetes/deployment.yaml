@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guest-app
+spec:
+  selector:
+    matchLabels:
+      app: guest-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: guest-app
+    spec:
+      containers:
+        - name: guest-app
+          image: guest-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGO_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: host
+                  name: mongo-config-guest
+            - name: MONGO_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: port
+                  name: mongo-config-guest
+            - name: MONGO_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: database
+                  name: mongo-config-guest
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: mongo-secret-guest
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: mongo-secret-guest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guest-app-service
+spec:
+  selector:
+    app: guest-app
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: NodePort

@@ -5,6 +5,7 @@ metadata:
     app: guest-app
   name: guest-app
 spec:
+  type: NodePort
   ports:
     - name: "8081"
       port: 8081

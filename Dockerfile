@@ -10,6 +10,7 @@ COPY ["src/main", "/code/src/main"]
 RUN ["mvn", "package"]
 
 FROM eclipse-temurin:17-jdk-alpine AS package
+EXPOSE 8080
 COPY --from=build /code/target/guest-app.jar /
 
 CMD ["java", "-jar", "/guest-app.jar"]

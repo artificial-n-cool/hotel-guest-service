@@ -21,7 +21,7 @@ services:
     ports:
       - "27018:27017"
     volumes:
-      - guest-db:/data/db
+      - ./src/main/resources/db:/data/db
     networks:
       - database-net
 volumes:
