@@ -6,7 +6,6 @@ import com.artificialncool.guestapp.dto.model.SmestajDTO;
 import com.artificialncool.guestapp.model.Rezervacija;
 import com.artificialncool.guestapp.model.enums.StatusRezervacije;
 import com.artificialncool.guestapp.service.RezervacijaService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

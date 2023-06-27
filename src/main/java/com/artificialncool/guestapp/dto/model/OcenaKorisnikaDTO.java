@@ -2,8 +2,6 @@ package com.artificialncool.guestapp.dto.model;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

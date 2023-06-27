@@ -16,7 +16,6 @@ import com.artificialncool.guestapp.service.OcenaSmestajService;
 import com.artificialncool.guestapp.service.RezervacijaService;
 import com.artificialncool.guestapp.service.SmestajService;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +28,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,6 +162,12 @@ public class SmestajController {
     @PostMapping(value = "/addSmestaj")
     public ResponseEntity<Void> createSmestaj(@RequestBody SmestajDTO smestajDTO) {
         smestajService.save(smestajConverter.fromDTO(smestajDTO));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/createData")
+    public ResponseEntity<Void> createSmestajData() {
+        smestajService.createSmestaj();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

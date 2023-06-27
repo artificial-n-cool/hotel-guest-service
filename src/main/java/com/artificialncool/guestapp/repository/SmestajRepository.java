@@ -3,7 +3,6 @@ package com.artificialncool.guestapp.repository;
 import com.artificialncool.guestapp.model.Smestaj;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 

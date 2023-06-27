@@ -7,9 +7,7 @@ import com.artificialncool.guestapp.model.Promocija;
 import com.artificialncool.guestapp.model.Rezervacija;
 import com.artificialncool.guestapp.model.Smestaj;
 import com.artificialncool.guestapp.model.enums.StatusRezervacije;
-import com.artificialncool.guestapp.repository.SmestajRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
