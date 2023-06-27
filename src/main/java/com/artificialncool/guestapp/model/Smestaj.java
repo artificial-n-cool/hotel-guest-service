@@ -5,7 +5,6 @@ import com.artificialncool.guestapp.model.helpers.OcenaSmestaja;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.util.List;
 

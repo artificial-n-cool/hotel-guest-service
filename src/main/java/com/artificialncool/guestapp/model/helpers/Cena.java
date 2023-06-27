@@ -4,7 +4,6 @@ package com.artificialncool.guestapp.model.helpers;
 import com.artificialncool.guestapp.model.enums.TipCene;
 import jakarta.persistence.Id;
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @NoArgsConstructor
 @AllArgsConstructor
