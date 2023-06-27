@@ -1,16 +1,12 @@
 package com.artificialncool.guestapp.service;
 
 import com.artificialncool.guestapp.model.Korisnik;
-import com.artificialncool.guestapp.model.Notifikacija;
-import com.artificialncool.guestapp.model.Smestaj;
 import com.artificialncool.guestapp.model.enums.KorisnickaUloga;
-import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import com.artificialncool.guestapp.repository.KorisnikRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

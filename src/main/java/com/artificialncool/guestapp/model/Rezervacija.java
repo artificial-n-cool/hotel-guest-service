@@ -4,7 +4,6 @@ import com.artificialncool.guestapp.model.enums.StatusRezervacije;
 import jakarta.persistence.Id;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
