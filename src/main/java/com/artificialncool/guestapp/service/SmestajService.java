@@ -3,7 +3,6 @@ package com.artificialncool.guestapp.service;
 
 import com.artificialncool.guestapp.dto.converter.SmestajConverter;
 import com.artificialncool.guestapp.dto.model.SmestajDTO;
-import com.artificialncool.guestapp.model.Korisnik;
 import com.artificialncool.guestapp.model.Rezervacija;
 import com.artificialncool.guestapp.model.Smestaj;
 import com.artificialncool.guestapp.model.enums.TipCene;
@@ -11,8 +10,11 @@ import com.artificialncool.guestapp.model.helpers.Cena;
 import com.artificialncool.guestapp.repository.SmestajRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -130,5 +132,8 @@ public class SmestajService {
     }
 
 
-
+    public Page<Smestaj> read(String location, Integer numGuests, LocalDateTime from, LocalDateTime to, Pageable pageable) {
+        return smestajRepository.findAllByLocationAndGuestsAndNoReservationsBetween(location.trim().toLowerCase(), numGuests,
+                from, to, pageable);
+    }
 }
