@@ -25,10 +25,10 @@ public class SmestajService {
     private final SmestajConverter smestajConverter;
 
 
-
-    public void deleteSmestaj(String id){
+    public void deleteSmestaj(String id) {
         smestajRepository.deleteById(id);
     }
+
     public Smestaj fromDTO(SmestajDTO dto) {
         return smestajConverter.fromDTO(dto);
     }
@@ -36,36 +36,35 @@ public class SmestajService {
     public SmestajDTO toDTO(Smestaj smestaj) {
         return smestajConverter.toDTO(smestaj);
     }
-    public List<Smestaj> getAllSmestaj(){
+
+    public List<Smestaj> getAllSmestaj() {
         return smestajRepository.findAll();
     }
 
-    public Smestaj getById(String id) throws EntityNotFoundException{
+    public Smestaj getById(String id) throws EntityNotFoundException {
         return smestajRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("No such smestaj"));
     }
 
-    public List<Smestaj> getAllByNaziv(String naziv){
+    public List<Smestaj> getAllByNaziv(String naziv) {
         return smestajRepository.findByNazivContainsIgnoreCase(naziv);
     }
 
-    public List<Smestaj> getAllByLokacija(String lokacija){
+    public List<Smestaj> getAllByLokacija(String lokacija) {
         return smestajRepository.findByLokacijaContainsIgnoreCase(lokacija);
     }
 
 
-
-    public List<Smestaj> getByNazivAndLokacija(String naziv, String lokacija)
-    {
+    public List<Smestaj> getByNazivAndLokacija(String naziv, String lokacija) {
         return smestajRepository.findByNazivContainsIgnoreCaseAndLokacijaContainsIgnoreCase(naziv, lokacija);
     }
 
-    public List<Smestaj> getAllAboveAverage(Double criterium){
+    public List<Smestaj> getAllAboveAverage(Double criterium) {
         return smestajRepository.findByProsecnaOcenaGreaterThanEqual(criterium);
     }
 
-    public List<Smestaj> getAllByVlasnikID(String vlasnikID){
+    public List<Smestaj> getAllByVlasnikID(String vlasnikID) {
         return smestajRepository.findByVlasnikID(vlasnikID);
     }
 
@@ -93,13 +92,14 @@ public class SmestajService {
         return old;
     }
 
-    public Smestaj update(Smestaj updated) throws EntityNotFoundException{
+    public Smestaj update(Smestaj updated) throws EntityNotFoundException {
         Smestaj old = getById(updated.getId());
 
         old = copy(old, updated);
 
         return smestajRepository.save(old);
     }
+
     public void createSmestaj() {
 
         // API call da se uzme Korisnik po ID-u
@@ -135,5 +135,19 @@ public class SmestajService {
     public Page<Smestaj> read(String location, Integer numGuests, LocalDateTime from, LocalDateTime to, Pageable pageable) {
         return smestajRepository.findAllByLocationAndGuestsAndNoReservationsBetween(location.trim().toLowerCase(), numGuests,
                 from, to, pageable);
+    }
+
+    public boolean checkIfCanGrade(String ocenjivacId, String hostId) {
+        List<Smestaj> smestaji = smestajRepository.findByVlasnikID(hostId);
+        for (var smestaj :
+                smestaji) {
+            for (var res :
+                    smestaj.getRezervacije()) {
+                if (res.getOcenjivacID().equals(ocenjivacId) && res.getDatumDo().isBefore(LocalDateTime.now())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
