@@ -4,7 +4,9 @@ import com.artificialncool.guestapp.dto.converter.KorisnikConverter;
 import com.artificialncool.guestapp.dto.model.HostDTO;
 import com.artificialncool.guestapp.model.Korisnik;
 import com.artificialncool.guestapp.model.enums.KorisnickaUloga;
+import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import com.artificialncool.guestapp.repository.KorisnikRepository;
+import com.mongodb.ConnectionString;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -171,5 +173,13 @@ public class KorisnikService {
 
     public Page<Korisnik> readHosts(String ime, Pageable pageable) {
         return this.korisnikRepository.findAllByImeContainingAndUloga(ime, KorisnickaUloga.HOST, pageable);
+    }
+
+    public Page<OcenaKorisnika> readOcene(String hostId, Pageable pageable) {
+        return this.korisnikRepository.findOceneKorisnikaById(hostId, pageable);
+    }
+
+    public Korisnik findById(String ocenjivacId) {
+        return this.korisnikRepository.getById(ocenjivacId);
     }
 }
