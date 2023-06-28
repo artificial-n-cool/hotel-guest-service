@@ -1,15 +1,12 @@
 package com.artificialncool.guestapp.controller;
 
 
-import com.artificialncool.guestapp.dto.converter.OcenaKorisnikaConverter;
 import com.artificialncool.guestapp.dto.converter.RezervacijaConverter;
 import com.artificialncool.guestapp.dto.converter.SmestajConverter;
 import com.artificialncool.guestapp.dto.model.*;
-import com.artificialncool.guestapp.model.Korisnik;
 import com.artificialncool.guestapp.model.Rezervacija;
 import com.artificialncool.guestapp.model.Smestaj;
 import com.artificialncool.guestapp.model.enums.StatusRezervacije;
-import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import com.artificialncool.guestapp.model.helpers.OcenaSmestaja;
 import com.artificialncool.guestapp.service.KorisnikService;
 import com.artificialncool.guestapp.service.OcenaSmestajService;
@@ -39,7 +36,7 @@ public class SmestajController {
     private final OcenaSmestajService ocenaSmestajService;
     private final SmestajConverter smestajConverter;
     private final RezervacijaConverter rezervacijaConverter;
-    private final OcenaKorisnikaConverter ocenaKorisnikaConverter;
+
     private final KorisnikService korisnikService;
 
     private final RestTemplate restTemplate;
@@ -47,14 +44,13 @@ public class SmestajController {
     private final RezervacijaService rezervacijaService;
 
 
-    public SmestajController(RezervacijaService rezervacijaService, RestTemplateBuilder builder, SmestajService smestajService, OcenaSmestajService ocenaSmestajService, SmestajConverter smestajConverter, RezervacijaConverter rezervacijaConverter, OcenaKorisnikaConverter ocenaKorisnikaConverter, KorisnikService korisnikService) {
+    public SmestajController(RezervacijaService rezervacijaService, RestTemplateBuilder builder, SmestajService smestajService, OcenaSmestajService ocenaSmestajService, SmestajConverter smestajConverter, RezervacijaConverter rezervacijaConverter, RezervacijaConverter rezervacijaConverter1, KorisnikService korisnikService) {
         this.rezervacijaService = rezervacijaService;
         this.restTemplate = builder.build();
         this.smestajService = smestajService;
         this.ocenaSmestajService = ocenaSmestajService;
         this.smestajConverter = smestajConverter;
-        this.rezervacijaConverter = rezervacijaConverter;
-        this.ocenaKorisnikaConverter = ocenaKorisnikaConverter;
+        this.rezervacijaConverter = rezervacijaConverter1;
         this.korisnikService = korisnikService;
     }
 
@@ -134,30 +130,7 @@ public class SmestajController {
     }
 
 
-    @PutMapping(value = "/oceniHosta")
-    public ResponseEntity<Double> oceniHosta(@RequestBody OcenaKorisnikaDTO ocenaKorisnikaDTO) throws EntityNotFoundException {
-        try {
-            OcenaKorisnika novaOcena = ocenaKorisnikaConverter.fromDTO(ocenaKorisnikaDTO);
-            Korisnik host = korisnikService.getById(ocenaKorisnikaDTO.getHostId());
-            List<OcenaKorisnika> prethodneOcene = host.getOcene();
-            Double stariProsek = host.getProsecnaOcena();
-            Double noviProsek = 0.0;
-            if (host.getOcene() != null && host.getOcene().toArray().length != 0) {
-                noviProsek = ((stariProsek * host.getOcene().toArray().length) + novaOcena.getOcena()) / (host.getOcene().toArray().length + 1);
-            } else {
-                noviProsek = ocenaKorisnikaDTO.getOcena();
-            }
-            prethodneOcene = new ArrayList<OcenaKorisnika>();
-            prethodneOcene.add(novaOcena);
-            host.setOcene(prethodneOcene);
-            host.setProsecnaOcena(noviProsek);
-            Korisnik k = korisnikService.save(host);
-            // TODO: MESSAGE CALL DA IMA NOVI HOST OCENA
-            return new ResponseEntity<>(k.getProsecnaOcena(), HttpStatus.OK);
-        } catch (EntityNotFoundException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema ovog smestaja!", ex);
-        }
-    }
+
 
     @PostMapping(value = "/addSmestaj")
     public ResponseEntity<Void> createSmestaj(@RequestBody SmestajDTO smestajDTO) {
