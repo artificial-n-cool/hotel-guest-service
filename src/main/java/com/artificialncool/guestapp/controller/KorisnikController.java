@@ -115,6 +115,52 @@ public class KorisnikController {
         }
     }
 
+    @PutMapping(value = "/obrisiOcenuHosta")
+    public ResponseEntity<HostDTO> obrisiOcenuHosta(@RequestBody OcenaKorisnikaDTO ocenaKorisnikaDTO) throws EntityNotFoundException {
+        try {
+            Korisnik host = korisnikService.getById(ocenaKorisnikaDTO.getHostId());
+
+
+            List<OcenaKorisnika> prethodneOcene = host.getOcene();
+
+            // provera da li azuriram ocenu ili dodajem novu
+            int increment = 0;
+            double difference = 0;
+            OcenaKorisnika ocenaForDelete = null;
+            if (prethodneOcene != null) {
+                for (var ocena :
+                        prethodneOcene) {
+                    if (ocena.getOcenjivacID().equals(ocenaKorisnikaDTO.getOcenjivacId())) {
+                        difference = 0 - ocena.getOcena();
+                        increment = 1;
+                        ocenaForDelete = ocena;
+                    }
+                }
+            }
+            if (ocenaForDelete == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nema ocene pa nije moguce obrisati ocenu ovog korisnika");
+            }
+            var len = prethodneOcene.size();
+            prethodneOcene.remove(ocenaForDelete);
+
+            Double stariProsek = host.getProsecnaOcena();
+            Double noviProsek;
+            if (host.getOcene() != null && prethodneOcene.toArray().length != 0) {
+                noviProsek = ((stariProsek * len) + difference) / (len - increment);
+            } else {
+                noviProsek = 0d;
+                prethodneOcene = new ArrayList<>();
+            }
+
+            host.setOcene(prethodneOcene);
+            host.setProsecnaOcena(noviProsek);
+            Korisnik k = korisnikService.save(host);
+            // TODO: MESSAGE CALL DA IMA NOVI HOST OCENA
+            return new ResponseEntity<>(korisnikConverter.toDTO(k), HttpStatus.OK);
+        } catch (EntityNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema ovog korisnika!", ex);
+        }
+    }
 
     @PostMapping(value = "/populate")
     public ResponseEntity<Void> populateDB() {
