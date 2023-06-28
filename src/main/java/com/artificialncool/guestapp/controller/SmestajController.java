@@ -82,6 +82,19 @@ public class SmestajController {
         );
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<SmestajDTO> readOne(@PathVariable String id) {
+        try {
+            return new ResponseEntity<>(
+                    smestajService.toDTO(smestajService.getById(id)),
+                    HttpStatus.OK
+            );
+        }
+        catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema smestaj sa tim ID", e);
+        }
+    }
+
     @GetMapping(value = "/hello")
     public ResponseEntity<String> hello() {
         return new ResponseEntity<>("HELLO FROM GUEST SERVICE", HttpStatus.OK);
