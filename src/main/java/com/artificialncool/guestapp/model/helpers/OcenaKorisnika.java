@@ -1,5 +1,6 @@
 package com.artificialncool.guestapp.model.helpers;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Id;
 import lombok.*;
 

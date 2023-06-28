@@ -2,26 +2,33 @@ package com.artificialncool.guestapp.controller;
 
 import com.artificialncool.guestapp.dto.converter.KorisnikConverter;
 import com.artificialncool.guestapp.dto.converter.OcenaKorisnikaConverter;
-import com.artificialncool.guestapp.dto.model.HostDTO;
-import com.artificialncool.guestapp.dto.model.HostRequestDTO;
-import com.artificialncool.guestapp.dto.model.OcenaKorisnikaDTO;
+import com.artificialncool.guestapp.dto.converter.OcenaResponseConverter;
+import com.artificialncool.guestapp.dto.model.*;
 import com.artificialncool.guestapp.model.Korisnik;
 import com.artificialncool.guestapp.model.helpers.OcenaKorisnika;
 import com.artificialncool.guestapp.service.KorisnikService;
 import com.artificialncool.guestapp.service.SmestajService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping(value = "/api/guest/korisnik")
@@ -35,11 +42,16 @@ public class KorisnikController {
 
     private final KorisnikConverter korisnikConverter;
 
-    public KorisnikController(KorisnikService korisnikService, SmestajService smestajService, OcenaKorisnikaConverter ocenaKorisnikaConverter, KorisnikConverter korisnikConverter) {
+    private final OcenaResponseConverter ocenaResponseConverter;
+    private final RestTemplate restTemplate;
+
+    public KorisnikController(KorisnikService korisnikService, SmestajService smestajService, OcenaKorisnikaConverter ocenaKorisnikaConverter, KorisnikConverter korisnikConverter, OcenaResponseConverter ocenaResponseConverter,  RestTemplateBuilder restTemplateBuilder) {
         this.korisnikService = korisnikService;
         this.smestajService = smestajService;
         this.ocenaKorisnikaConverter = ocenaKorisnikaConverter;
         this.korisnikConverter = korisnikConverter;
+        this.ocenaResponseConverter = ocenaResponseConverter;
+        this.restTemplate = restTemplateBuilder.build();
     }
 
     @GetMapping("/{id}")
@@ -63,6 +75,74 @@ public class KorisnikController {
         return page.map(korisnikService::toDTO);
     }
 
+    @GetMapping(value = "/search-host-ratings")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<OcenaResponseDTO> readHostRatings(@Valid OceneHostRequestDTO request,
+                                                  @PageableDefault Pageable pageable) {
+        var k = korisnikService.getById(request.getHostId());
+        var page = korisnikService.readOcene(request.getHostId(), pageable);
+        for (int i = 0; i < page.getContent().size(); i++) {
+            try {
+                page.getContent().get(i).setOcena(k.getOcene().get(i).getOcena());
+                page.getContent().get(i).setDatum(k.getOcene().get(i).getDatum());
+                page.getContent().get(i).setOcenjivacID(k.getOcene().get(i).getOcenjivacID());
+            } catch (Exception e) {
+
+            }
+        }
+        try {
+            var ocene = page.map(ocenaResponseConverter::toDTOForOcena);
+            for (var ocena :
+                    ocene.getContent()) {
+                try {
+//                    ocena.setUsername(korisnikService.getById(ocena.getOcenjivacId()).getUsername());
+                    ocena.setUsername("Kobe");
+                } catch (Exception e) {
+
+                }
+            }
+            return ocene;
+        } catch (Exception e) {
+
+        }
+        return Page.empty();
+    }
+
+
+    @GetMapping(value = "/search-host-ratings-list")
+    @ResponseStatus(HttpStatus.OK)
+    public List<OcenaResponseDTO> readHostRatingsList(@Valid OceneHostRequestDTO request
+    ) {
+        var k = korisnikService.getById(request.getHostId());
+
+        var ocene = k.getOcene().stream().map(ocenaResponseConverter::toDTOForOcena).toList();
+
+        try{
+            ParameterizedTypeReference<List<Korisnik>> responseType = new ParameterizedTypeReference<List<Korisnik>>() {};
+
+            ResponseEntity<List<Korisnik>> response = restTemplate.exchange(
+                    "http://localhost:9091/api/user/all",
+                    HttpMethod.GET,
+                    null,
+                    responseType
+            );
+
+            List<Korisnik> korisnici = response.getBody();
+            for (var o :
+                    ocene) {
+                var uname = korisnici.stream().filter(as->as.getId().equals(o.getOcenjivacId())).findFirst().get().getUsername();
+                o.setUsername(uname);
+            }
+            return ocene;
+
+        }
+        catch (RestClientException ex){
+            ex.printStackTrace();
+        }
+        return new ArrayList<>();
+
+    }
+
     @PutMapping(value = "/oceniHosta")
     public ResponseEntity<HostDTO> oceniHosta(@RequestBody OcenaKorisnikaDTO ocenaKorisnikaDTO) throws EntityNotFoundException {
         try {
@@ -71,9 +151,9 @@ public class KorisnikController {
 
             // Provera da li smem da ocenjujem
             boolean canRate = smestajService.checkIfCanGrade(ocenaKorisnikaDTO.getOcenjivacId(), ocenaKorisnikaDTO.getHostId());
-            if (!canRate) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nema rezervacija pa nije moguce oceniti ovog korisnika");
-            }
+//            if (!canRate) {
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nema rezervacija pa nije moguce oceniti ovog korisnika");
+//            }
 
             List<OcenaKorisnika> prethodneOcene = host.getOcene();
 
