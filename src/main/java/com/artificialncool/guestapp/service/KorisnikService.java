@@ -79,7 +79,7 @@ public class KorisnikService {
     public Korisnik getById(String id) throws EntityNotFoundException {
         return korisnikRepository
                 .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("No such smestaj"));
+                .orElseThrow(() -> new EntityNotFoundException("No such korisnik"));
     }
 
     public HostDTO toDTO(Korisnik korisnik) {
