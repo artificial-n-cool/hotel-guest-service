@@ -5,6 +5,7 @@ import com.artificialncool.guestapp.dto.converter.SmestajConverter;
 import com.artificialncool.guestapp.dto.model.SmestajDTO;
 import com.artificialncool.guestapp.model.Rezervacija;
 import com.artificialncool.guestapp.model.Smestaj;
+import com.artificialncool.guestapp.model.enums.StatusRezervacije;
 import com.artificialncool.guestapp.model.enums.TipCene;
 import com.artificialncool.guestapp.model.helpers.Cena;
 import com.artificialncool.guestapp.repository.SmestajRepository;
@@ -143,7 +144,7 @@ public class SmestajService {
                 smestaji) {
             for (var res :
                     smestaj.getRezervacije()) {
-                if (res.getOcenjivacID().equals(ocenjivacId) && res.getDatumDo().isBefore(LocalDateTime.now())) {
+                if (res.getOcenjivacID().equals(ocenjivacId) && res.getDatumDo().isBefore(LocalDateTime.now()) && res.getStatusRezervacije().equals(StatusRezervacije.PRIHVACENO)) {
                     return true;
                 }
             }

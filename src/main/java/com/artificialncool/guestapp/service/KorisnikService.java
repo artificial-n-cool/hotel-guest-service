@@ -70,6 +70,8 @@ public class KorisnikService {
                 .uloga(KorisnickaUloga.HOST)
                 .build()
         );
+
+
     }
 
     public List<Korisnik> getAll() {
