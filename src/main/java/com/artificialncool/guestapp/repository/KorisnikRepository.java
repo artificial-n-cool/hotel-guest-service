@@ -2,6 +2,8 @@ package com.artificialncool.guestapp.repository;
 
 import com.artificialncool.guestapp.model.Korisnik;
 import com.artificialncool.guestapp.model.enums.KorisnickaUloga;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
@@ -20,23 +22,5 @@ public interface KorisnikRepository extends MongoRepository<Korisnik, String> {
 
     long deleteByEmailIgnoreCase(String email);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    Page<Korisnik> findAllByImeContainingAndUloga(String ime, KorisnickaUloga uloga, Pageable pageable);
 }
