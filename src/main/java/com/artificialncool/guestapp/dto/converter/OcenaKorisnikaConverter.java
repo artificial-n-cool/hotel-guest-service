@@ -16,7 +16,7 @@ public class OcenaKorisnikaConverter {
                 .ocena(dto.getOcena())
                 .id(dto.getId())
                 .ocenjivacID(dto.getOcenjivacId())
-                .datum(LocalDateTime.parse(dto.getDatum()))
+                .datum(LocalDateTime.now())
                 .build();
     }
 }

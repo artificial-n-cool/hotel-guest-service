@@ -1,5 +1,6 @@
 package com.artificialncool.guestapp.controller;
 
+import com.artificialncool.guestapp.dto.converter.KorisnikConverter;
 import com.artificialncool.guestapp.dto.converter.OcenaKorisnikaConverter;
 import com.artificialncool.guestapp.dto.model.HostDTO;
 import com.artificialncool.guestapp.dto.model.HostRequestDTO;
@@ -32,10 +33,13 @@ public class KorisnikController {
 
     private final OcenaKorisnikaConverter ocenaKorisnikaConverter;
 
-    public KorisnikController(KorisnikService korisnikService, SmestajService smestajService, OcenaKorisnikaConverter ocenaKorisnikaConverter) {
+    private final KorisnikConverter korisnikConverter;
+
+    public KorisnikController(KorisnikService korisnikService, SmestajService smestajService, OcenaKorisnikaConverter ocenaKorisnikaConverter, KorisnikConverter korisnikConverter) {
         this.korisnikService = korisnikService;
         this.smestajService = smestajService;
         this.ocenaKorisnikaConverter = ocenaKorisnikaConverter;
+        this.korisnikConverter = korisnikConverter;
     }
 
     @GetMapping("/{id}")
@@ -60,7 +64,7 @@ public class KorisnikController {
     }
 
     @PutMapping(value = "/oceniHosta")
-    public ResponseEntity<Double> oceniHosta(@RequestBody OcenaKorisnikaDTO ocenaKorisnikaDTO) throws EntityNotFoundException {
+    public ResponseEntity<HostDTO> oceniHosta(@RequestBody OcenaKorisnikaDTO ocenaKorisnikaDTO) throws EntityNotFoundException {
         try {
             OcenaKorisnika novaOcena = ocenaKorisnikaConverter.fromDTO(ocenaKorisnikaDTO);
             Korisnik host = korisnikService.getById(ocenaKorisnikaDTO.getHostId());
@@ -76,13 +80,15 @@ public class KorisnikController {
             // provera da li azuriram ocenu ili dodajem novu
             int increment = 1;
             double difference = ocenaKorisnikaDTO.getOcena();
-            for (var ocena :
-                    prethodneOcene) {
-                if (ocena.getOcenjivacID().equals(ocenaKorisnikaDTO.getOcenjivacId())) {
-                    difference = difference - ocena.getOcena();
-                    ocena.setOcena(ocenaKorisnikaDTO.getOcena());
-                    ocena.setDatum(LocalDateTime.now());
-                    increment = 0;
+            if (prethodneOcene != null) {
+                for (var ocena :
+                        prethodneOcene) {
+                    if (ocena.getOcenjivacID().equals(ocenaKorisnikaDTO.getOcenjivacId())) {
+                        difference = difference - ocena.getOcena();
+                        ocena.setOcena(ocenaKorisnikaDTO.getOcena());
+                        ocena.setDatum(LocalDateTime.now());
+                        increment = 0;
+                    }
                 }
             }
 
@@ -96,12 +102,14 @@ public class KorisnikController {
                 prethodneOcene = new ArrayList<>();
             }
 
-            prethodneOcene.add(novaOcena);
+            if (increment == 1) {
+                prethodneOcene.add(novaOcena);
+            }
             host.setOcene(prethodneOcene);
             host.setProsecnaOcena(noviProsek);
             Korisnik k = korisnikService.save(host);
             // TODO: MESSAGE CALL DA IMA NOVI HOST OCENA
-            return new ResponseEntity<>(k.getProsecnaOcena(), HttpStatus.OK);
+            return new ResponseEntity<>(korisnikConverter.toDTO(k), HttpStatus.OK);
         } catch (EntityNotFoundException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema ovog korisnika!", ex);
         }
