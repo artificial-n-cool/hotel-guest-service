@@ -253,7 +253,7 @@ public class SmestajController {
             return ocene;
 
         } catch (RestClientException ex) {
-            ex.printStackTrace();
+
         }
         return new ArrayList<>();
     }
