@@ -173,6 +173,53 @@ public class SmestajController {
         }
     }
 
+    @PutMapping(value = "/obrisiOcenuSmestaja")
+    public ResponseEntity<SmestajDTO> obrisiOcenuSmestaja(@RequestBody OcenaSmestajaDTO ocenaSmestajaDTO) throws EntityNotFoundException {
+        try {
+            Smestaj smestaj = smestajService.getById(ocenaSmestajaDTO.getSmestajId());
+
+
+            List<OcenaSmestaja> prethodneOcene = smestaj.getOcene();
+
+            // provera da li azuriram ocenu ili dodajem novu
+            int increment = 0;
+            double difference = 0;
+            OcenaSmestaja ocenaForDelete = null;
+            if (prethodneOcene != null) {
+                for (var ocena :
+                        prethodneOcene) {
+                    if (ocena.getOcenjivacID().equals(ocenaSmestajaDTO.getOcenjivacId())) {
+                        difference = 0 - ocena.getOcena();
+                        increment = 1;
+                        ocenaForDelete = ocena;
+                    }
+                }
+            }
+            if (ocenaForDelete == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nema ocene pa nije moguce obrisati ocenu ovog smestaja");
+            }
+            var len = prethodneOcene.size();
+            prethodneOcene.remove(ocenaForDelete);
+
+            Double stariProsek = smestaj.getProsecnaOcena();
+            Double noviProsek;
+            if (smestaj.getOcene() != null && !prethodneOcene.isEmpty()) {
+                noviProsek = ((stariProsek * len) + difference) / (len - increment);
+            } else {
+                noviProsek = 0d;
+                prethodneOcene = new ArrayList<>();
+            }
+
+            smestaj.setOcene(prethodneOcene);
+            smestaj.setProsecnaOcena(noviProsek);
+            Smestaj k = smestajService.save(smestaj);
+            // TODO: MESSAGE CALL DA IMA NOVI HOST OCENA
+            return new ResponseEntity<>(smestajService.toDTO(k), HttpStatus.OK);
+        } catch (EntityNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema ovog korisnika!", ex);
+        }
+    }
+
     @PutMapping(value = "/oceniHosta")
     public ResponseEntity<Double> oceniHosta(@RequestBody OcenaKorisnikaDTO ocenaKorisnikaDTO) throws EntityNotFoundException {
         try {
