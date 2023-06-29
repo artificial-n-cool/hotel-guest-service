@@ -175,8 +175,8 @@ public class KorisnikController {
 
             Double stariProsek = host.getProsecnaOcena();
             Double noviProsek;
-            if (host.getOcene() != null && host.getOcene().toArray().length != 0) {
-                noviProsek = ((stariProsek * host.getOcene().toArray().length) + difference) / (host.getOcene().toArray().length + increment);
+            if (host.getOcene() != null && !host.getOcene().isEmpty()) {
+                noviProsek = ((stariProsek * host.getOcene().size()) + difference) / (host.getOcene().size() + increment);
             } else {
                 noviProsek = ocenaKorisnikaDTO.getOcena();
                 prethodneOcene = new ArrayList<>();
@@ -225,7 +225,7 @@ public class KorisnikController {
 
             Double stariProsek = host.getProsecnaOcena();
             Double noviProsek;
-            if (host.getOcene() != null && prethodneOcene.toArray().length != 0) {
+            if (host.getOcene() != null && !prethodneOcene.isEmpty()) {
                 noviProsek = ((stariProsek * len) + difference) / (len - increment);
             } else {
                 noviProsek = 0d;

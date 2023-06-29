@@ -89,8 +89,7 @@ public class SmestajController {
                     smestajService.toDTO(smestajService.getById(id)),
                     HttpStatus.OK
             );
-        }
-        catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema smestaj sa tim ID", e);
         }
     }
@@ -126,17 +125,43 @@ public class SmestajController {
         try {
             OcenaSmestaja novaOcena = ocenaSmestajService.fromDTO(ocenaSmestajaDTO);
             Smestaj smestaj = smestajService.getById(ocenaSmestajaDTO.getSmestajId());
+
+
+
+            // Provera da li smem da ocenjujem
+//            boolean canRate = smestajService.checkIfCanGrade(ocenaKorisnikaDTO.getOcenjivacId(), ocenaKorisnikaDTO.getHostId());
+//            if (!canRate) {
+//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nema rezervacija pa nije moguce oceniti ovog korisnika");
+//            }
+
             List<OcenaSmestaja> prethodneOcene = smestaj.getOcene();
-            Double stariProsek = smestaj.getProsecnaOcena();
-            Double noviProsek = 0.0;
-            if (smestaj.getOcene().toArray().length != 0) {
-                noviProsek = ((stariProsek * smestaj.getOcene().toArray().length) + novaOcena.getOcena()) / (smestaj.getOcene().toArray().length + 1);
-            } else {
-                noviProsek = ocenaSmestajaDTO.getOcena();
+
+            int increment = 1;
+            double difference = ocenaSmestajaDTO.getOcena();
+            if (prethodneOcene != null) {
+                for (var ocena :
+                        prethodneOcene) {
+                    if (ocena.getOcenjivacID().equals(ocenaSmestajaDTO.getOcenjivacId())) {
+                        difference = difference - ocena.getOcena();
+                        ocena.setOcena(ocenaSmestajaDTO.getOcena());
+                        ocena.setDatum(LocalDateTime.now());
+                        increment = 0;
+                    }
+                }
             }
 
-            prethodneOcene = new ArrayList<OcenaSmestaja>();
-            prethodneOcene.add(novaOcena);
+            Double stariProsek = smestaj.getProsecnaOcena();
+            Double noviProsek;
+            if (smestaj.getOcene() != null && !smestaj.getOcene().isEmpty()) {
+                noviProsek = ((stariProsek * smestaj.getOcene().size()) + difference) / (smestaj.getOcene().size() + increment);
+            } else {
+                noviProsek = ocenaSmestajaDTO.getOcena();
+                prethodneOcene = new ArrayList<>();
+            }
+            if (increment == 1) {
+                prethodneOcene.add(novaOcena);
+            }
+
             smestaj.setOcene(prethodneOcene);
             smestaj.setProsecnaOcena(noviProsek);
             Smestaj s = smestajService.save(smestaj);
