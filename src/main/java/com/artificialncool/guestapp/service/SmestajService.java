@@ -151,4 +151,19 @@ public class SmestajService {
         }
         return false;
     }
+
+    public boolean checkIfCanGradeSmestaj(String ocenjivacId, String smestajId) {
+        var smestaj = this.getById(smestajId);
+        if (smestaj.getRezervacije() == null){
+            return false;
+        }
+        for (var res :
+                smestaj.getRezervacije()) {
+            if (res.getOcenjivacID().equals(ocenjivacId) && res.getDatumDo().isBefore(LocalDateTime.now()) && res.getStatusRezervacije().equals(StatusRezervacije.PRIHVACENO)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
