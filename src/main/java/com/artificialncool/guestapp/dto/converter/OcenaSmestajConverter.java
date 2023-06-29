@@ -4,6 +4,8 @@ import com.artificialncool.guestapp.dto.model.OcenaSmestajaDTO;
 import com.artificialncool.guestapp.model.helpers.OcenaSmestaja;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class OcenaSmestajConverter {
 
@@ -11,7 +13,7 @@ public class OcenaSmestajConverter {
     {
         return OcenaSmestaja.builder()
                 .id(dto.getId())
-                .datum(dto.getDatum())
+                .datum(LocalDateTime.now())
                 .ocena(dto.getOcena())
                 .ocenjivacID(dto.getOcenjivacId())
                 .build();
