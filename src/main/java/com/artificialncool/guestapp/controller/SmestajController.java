@@ -34,6 +34,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/guest/smestaj")
@@ -232,8 +233,9 @@ public class SmestajController {
 
         var ocene = k.getOcene().stream().map(ocenaResponseConverter::toDTOForOcena).toList();
 
-        try{
-            ParameterizedTypeReference<List<Korisnik>> responseType = new ParameterizedTypeReference<List<Korisnik>>() {};
+        try {
+            ParameterizedTypeReference<List<Korisnik>> responseType = new ParameterizedTypeReference<List<Korisnik>>() {
+            };
 
             ResponseEntity<List<Korisnik>> response = restTemplate.exchange(
                     "http://localhost:9091/api/user/all",
@@ -245,13 +247,12 @@ public class SmestajController {
             List<Korisnik> korisnici = response.getBody();
             for (var o :
                     ocene) {
-                var uname = korisnici.stream().filter(as->as.getId().equals(o.getOcenjivacId())).findFirst().get().getUsername();
+                var uname = korisnici.stream().filter(as -> as.getId().equals(o.getOcenjivacId())).findFirst().get().getUsername();
                 o.setUsername(uname);
             }
             return ocene;
 
-        }
-        catch (RestClientException ex){
+        } catch (RestClientException ex) {
             ex.printStackTrace();
         }
         return new ArrayList<>();
@@ -296,8 +297,10 @@ public class SmestajController {
     }
 
     @PutMapping(value = "/otkaziRezervaciju")
-    public ResponseEntity<Void> otkaziRezervaciju(@RequestBody String smestajID, @RequestBody String rezervacijaID) throws EntityNotFoundException {
+    public ResponseEntity<Void> otkaziRezervaciju(@RequestBody Map<String, String> requestMap) throws EntityNotFoundException {
         try {
+            var smestajID = requestMap.get("smestajID");
+            var rezervacijaID = requestMap.get("rezervacijaID");
             Smestaj smestaj = smestajService.getById(smestajID);
             List<Rezervacija> sveRezervacije = smestaj.getRezervacije();
             if (sveRezervacije == null) {
