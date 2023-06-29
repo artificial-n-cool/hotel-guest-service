@@ -129,10 +129,10 @@ public class SmestajController {
 
 
             // Provera da li smem da ocenjujem
-//            boolean canRate = smestajService.checkIfCanGrade(ocenaKorisnikaDTO.getOcenjivacId(), ocenaKorisnikaDTO.getHostId());
-//            if (!canRate) {
-//                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nema rezervacija pa nije moguce oceniti ovog korisnika");
-//            }
+            boolean canRate = smestajService.checkIfCanGradeSmestaj(ocenaSmestajaDTO.getOcenjivacId(), ocenaSmestajaDTO.getSmestajId());
+            if (!canRate) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nema rezervacija pa nije moguce oceniti ovaj smestaj");
+            }
 
             List<OcenaSmestaja> prethodneOcene = smestaj.getOcene();
 
