@@ -2,6 +2,7 @@ package com.artificialncool.guestapp.controller;
 
 
 import com.artificialncool.guestapp.dto.converter.OcenaKorisnikaConverter;
+import com.artificialncool.guestapp.dto.converter.OcenaResponseConverter;
 import com.artificialncool.guestapp.dto.converter.RezervacijaConverter;
 import com.artificialncool.guestapp.dto.converter.SmestajConverter;
 import com.artificialncool.guestapp.dto.model.*;
@@ -17,9 +18,11 @@ import com.artificialncool.guestapp.service.RezervacijaService;
 import com.artificialncool.guestapp.service.SmestajService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,8 +51,10 @@ public class SmestajController {
 
     private final RezervacijaService rezervacijaService;
 
+    private final OcenaResponseConverter ocenaResponseConverter;
 
-    public SmestajController(RezervacijaService rezervacijaService, RestTemplateBuilder builder, SmestajService smestajService, OcenaSmestajService ocenaSmestajService, SmestajConverter smestajConverter, RezervacijaConverter rezervacijaConverter, RezervacijaConverter rezervacijaConverter1, OcenaKorisnikaConverter ocenaKorisnikaConverter, KorisnikService korisnikService) {
+
+    public SmestajController(RezervacijaService rezervacijaService, RestTemplateBuilder builder, SmestajService smestajService, OcenaSmestajService ocenaSmestajService, SmestajConverter smestajConverter, RezervacijaConverter rezervacijaConverter, RezervacijaConverter rezervacijaConverter1, OcenaKorisnikaConverter ocenaKorisnikaConverter, KorisnikService korisnikService, OcenaResponseConverter ocenaResponseConverter) {
         this.rezervacijaService = rezervacijaService;
         this.restTemplate = builder.build();
         this.smestajService = smestajService;
@@ -58,6 +63,7 @@ public class SmestajController {
         this.rezervacijaConverter = rezervacijaConverter1;
         this.ocenaKorisnikaConverter = ocenaKorisnikaConverter;
         this.korisnikService = korisnikService;
+        this.ocenaResponseConverter = ocenaResponseConverter;
     }
 
 
@@ -127,7 +133,6 @@ public class SmestajController {
             Smestaj smestaj = smestajService.getById(ocenaSmestajaDTO.getSmestajId());
 
 
-
             // Provera da li smem da ocenjujem
             boolean canRate = smestajService.checkIfCanGradeSmestaj(ocenaSmestajaDTO.getOcenjivacId(), ocenaSmestajaDTO.getSmestajId());
             if (!canRate) {
@@ -178,7 +183,6 @@ public class SmestajController {
         try {
             Smestaj smestaj = smestajService.getById(ocenaSmestajaDTO.getSmestajId());
 
-
             List<OcenaSmestaja> prethodneOcene = smestaj.getOcene();
 
             // provera da li azuriram ocenu ili dodajem novu
@@ -218,6 +222,39 @@ public class SmestajController {
         } catch (EntityNotFoundException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nema ovog korisnika!", ex);
         }
+    }
+
+    @GetMapping(value = "/search-smestaj-ratings-list")
+    @ResponseStatus(HttpStatus.OK)
+    public List<OcenaResponseDTO> readSmestajRatingsList(@Valid OceneSmestajRequestDTO request
+    ) {
+        var k = smestajService.getById(request.getSmestajId());
+
+        var ocene = k.getOcene().stream().map(ocenaResponseConverter::toDTOForOcena).toList();
+
+        try{
+            ParameterizedTypeReference<List<Korisnik>> responseType = new ParameterizedTypeReference<List<Korisnik>>() {};
+
+            ResponseEntity<List<Korisnik>> response = restTemplate.exchange(
+                    "http://localhost:9091/api/user/all",
+                    HttpMethod.GET,
+                    null,
+                    responseType
+            );
+
+            List<Korisnik> korisnici = response.getBody();
+            for (var o :
+                    ocene) {
+                var uname = korisnici.stream().filter(as->as.getId().equals(o.getOcenjivacId())).findFirst().get().getUsername();
+                o.setUsername(uname);
+            }
+            return ocene;
+
+        }
+        catch (RestClientException ex){
+            ex.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     @PutMapping(value = "/oceniHosta")
