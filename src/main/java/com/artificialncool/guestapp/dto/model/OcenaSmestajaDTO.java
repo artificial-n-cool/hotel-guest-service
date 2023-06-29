@@ -14,6 +14,6 @@ public class OcenaSmestajaDTO {
     private String id;
     private String ocenjivacId;
     private Double ocena;
-    private LocalDateTime datum;
+    private String datum;
     private String smestajId;
 }
