@@ -137,7 +137,7 @@ public class KorisnikController {
 
         }
         catch (RestClientException ex){
-            ex.printStackTrace();
+
         }
         return new ArrayList<>();
 
